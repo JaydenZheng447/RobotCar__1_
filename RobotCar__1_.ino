@@ -1,44 +1,37 @@
 
 #include <SoftwareSerial.h>
+//  check this link for more: https://docs.arduino.cc/learn/built-in-libraries/software-serial/
 
-// // ok
-int motA_pin1 = 11;
-int motA_pin2 = 11;
-int motB_pin1 = 11;
-int motB_pin2 = 11;
+// i'm making these comments for future reference
+
 char command;
-int drain = 3;
-int gate = 2;
-int PWM_Speed = 200; // medium speed (currentSpeed = 2)
+int drain = 2; // red blue motor 1
+int gate = 3;
+int MOSFET_DRAIN = 4; // red blue motor 2
+int MOSFET_GATE = 5;
+int MOSFET_BW_GATE_1 = 6; // black white motor 1
+int MOSFET_BW_DRAIN_1 = 7;
+int MOSFET_BW_GATE_2 = 8; // black white motor 2
+int MOSFET_BW_DRAIN_2 = 9;
+
+int PWM_Speed = 200; // medium speed (int currentSpeed = 2)
 int currentSpeed = 2;
-// 2 stands for medium(123), 1 stands for slow(61), 3 stands for fast (255)
+// 2 stands for medium(200), 1 stands for slow(160), 3 stands for fast (255)
 
-// int MOSFET_UL_GATE = 13; // mosfet upper right gate terminal
-// int MOSFET_LL_GATE = 2;
-// int MOSFET_UR_GATE = 12;
-// int MOSFET_LR_GATE = 3;
-int MOSFET_DRAIN = 4;
-int MOSFET_GATE = 6;
-
-SoftwareSerial btSerial(12, 13);
+SoftwareSerial btSerial(12, 13); // SoftwareSerial objectname(the wire that goes into HC05 TXD pin, the wire that goes into HC05 RXD pin)
+// btSerial is the object name for this
 
 void setup()
 {
 
-  pinMode(motA_pin1, OUTPUT);
-  pinMode(motA_pin2, OUTPUT);
-  pinMode(motB_pin1, OUTPUT);
-  pinMode(motB_pin2, OUTPUT);
-
-  // temp
   pinMode(drain, OUTPUT);
   pinMode(gate, OUTPUT);
   pinMode(MOSFET_DRAIN, OUTPUT);
   pinMode(MOSFET_GATE, OUTPUT);
-  // pinMode(MOSFET_LL_GATE, OUTPUT);
-  // pinMode(MOSFET_LR_GATE, OUTPUT);
-  // pinMode(MOSFET_UL_GATE, OUTPUT);
-  // pinMode(MOSFET_UR_GATE, OUTPUT);
+  pinMode(MOSFET_BW_GATE_1, OUTPUT);
+  pinMode(MOSFET_BW_DRAIN_2, OUTPUT);
+  pinMode(MOSFET_BW_DRAIN_1, OUTPUT);
+  pinMode(MOSFET_BW_GATE_2, OUTPUT);
   Serial.begin(9600);
 
   Serial.println("Setup...");
@@ -99,62 +92,55 @@ void forward()
 {
 
   Serial.println("forward");
-  // digitalWrite(motA_pin1, HIGH);
-  // digitalWrite(motA_pin2, LOW);
 
-  // digitalWrite(motB_pin1, HIGH);
-  // digitalWrite(motB_pin2, LOW);
   digitalWrite(gate, HIGH);
   digitalWrite(drain, HIGH);
   digitalWrite(MOSFET_DRAIN, HIGH);
   digitalWrite(MOSFET_GATE, HIGH);
-  // digitalWrite(MOSFET_UR_GATE, HIGH);
-  // digitalWrite(MOSFET_LL_GATE, HIGH);
-  // digitalWrite(MOSFET_UR_DRAIN, HIGH);
+  digitalWrite(MOSFET_BW_GATE_2, HIGH);
+  digitalWrite(MOSFET_BW_GATE_1, HIGH);
+  digitalWrite(MOSFET_BW_DRAIN_1, HIGH);
+  digitalWrite(MOSFET_BW_DRAIN_2, HIGH);
+
   delay(10);
 }
 
 void backward()
 {
   Serial.println("backward");
-  digitalWrite(motA_pin1, LOW);
-  digitalWrite(motA_pin2, HIGH);
-
-  digitalWrite(motB_pin1, LOW);
-  digitalWrite(motB_pin2, HIGH);
 
   digitalWrite(gate, HIGH);
   analogWrite(drain, PWM_Speed);
   digitalWrite(MOSFET_GATE, HIGH);
-  analogWrite(MOSFET_DRAIN, PWM_Speed);
+  analogWrite(MOSFET_DRAIN, PWM_Speed); // motor speed seems to dependent on the voltage in the drain pin
 
-  // digitalWrite(MOSFET_UL_GATE, HIGH);
-  // digitalWrite(MOSFET_LR_GATE, HIGH);
-  // digitalWrite(MOSFET_UL_DRAIN, HIGH);
+  digitalWrite(MOSFET_BW_GATE_1, HIGH);
+  digitalWrite(MOSFET_BW_GATE_2, HIGH);
+  analogWrite(MOSFET_BW_DRAIN_1, PWM_Speed);
+  analogWrite(MOSFET_BW_DRAIN_2, PWM_Speed);
+
   delay(10);
 }
 
 void left()
 {
   Serial.println("left");
-  digitalWrite(motA_pin1, LOW);  // left mot REV
-  digitalWrite(motA_pin2, LOW);  // left mot rev
-  digitalWrite(motB_pin1, HIGH); // right mot front
-  digitalWrite(motB_pin2, LOW);  // right mot front
+
   delay(10);
   analogWrite(gate, PWM_Speed);
   analogWrite(drain, PWM_Speed);
   analogWrite(MOSFET_GATE, PWM_Speed);
   analogWrite(MOSFET_DRAIN, PWM_Speed);
+  analogWrite(MOSFET_BW_DRAIN_1, PWM_Speed);
+  analogWrite(MOSFET_BW_GATE_1, PWM_Speed);
+  analogWrite(MOSFET_BW_DRAIN_2, PWM_Speed);
+  analogWrite(MOSFET_BW_GATE_2, PWM_Speed);
 }
 
 void right()
 {
   Serial.println("right");
-  digitalWrite(motA_pin1, HIGH);
-  digitalWrite(motA_pin2, LOW);
-  digitalWrite(motB_pin1, LOW);
-  digitalWrite(motB_pin2, LOW);
+
   analogWrite(gate, PWM_Speed);
   digitalWrite(drain, HIGH);
   digitalWrite(MOSFET_DRAIN, HIGH);
@@ -165,14 +151,14 @@ void right()
 void stop()
 {
   Serial.println("stop");
-  digitalWrite(motA_pin1, LOW);
-  digitalWrite(motA_pin2, LOW);
-  digitalWrite(motB_pin1, LOW);
-  digitalWrite(motB_pin2, LOW);
   digitalWrite(gate, LOW);
   digitalWrite(drain, LOW);
   digitalWrite(MOSFET_DRAIN, LOW);
   digitalWrite(MOSFET_GATE, LOW);
+  digitalWrite(MOSFET_BW_GATE_2, LOW);
+  digitalWrite(MOSFET_BW_GATE_1, LOW);
+  digitalWrite(MOSFET_BW_DRAIN_1, LOW);
+  digitalWrite(MOSFET_BW_DRAIN_2, LOW);
 }
 
 // slow = 160 mediu = 200 fast=255
@@ -224,7 +210,7 @@ void slow()
   if (currentSpeed == 2) // medium
   {
     delay(500);
-    PWM_Speed = 100;
+    PWM_Speed = 160;
   }
   else if (currentSpeed == 3) // fast
   {
@@ -233,7 +219,7 @@ void slow()
     delay(1000);
     PWM_Speed = 190;
     delay(1000);
-    PWM_Speed = 100;
+    PWM_Speed = 160;
   }
   Serial.println(PWM_Speed);
   currentSpeed = 1;
