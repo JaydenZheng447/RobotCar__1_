@@ -3,6 +3,18 @@
 //  check this link for more: https://docs.arduino.cc/learn/built-in-libraries/software-serial/
 
 // i'm making these comments for future reference
+//when motors are Blue-Red IO 1 it spinss CCW, IO2 makes it spin CW
+//when motors are White-Black IO 1 it spinss CCW, IO2 makes it also spin CW
+
+//motor 2 needs to be input 2 for CW and motor 4 needs to be input 3 for CW
+//motor 1 needs to be input 2 to be CW and motpr 3 needs to be input 2 to be CW
+//just use the other input for each motor if you want to reverse directionality
+//for this i will put motor 1 and 3 (front left and back right) in CCW and motors 2 and 4 (front right and back left) in CW
+
+//top motor driver IO 1 and 2 refer to motor 2
+//top motor driver IO 3 and 4 refer to motor 1
+//bottom motor driver IO 1 and 2 refer to motor 3
+//bottom motor driver IO 3 and 4 refer to motor 4
 
 char command;
 int drain = 2; // red blue motor 1
@@ -112,7 +124,7 @@ void backward()
   digitalWrite(gate, HIGH);
   analogWrite(drain, PWM_Speed);
   digitalWrite(MOSFET_GATE, HIGH);
-  analogWrite(MOSFET_DRAIN, PWM_Speed); // motor speed seems to dependent on the voltage in the drain pin
+  analogWrite(MOSFET_DRAIN, PWM_Speed); // motor speed seems to dependent on the voltage in both the drain and gate pin
 
   digitalWrite(MOSFET_BW_GATE_1, HIGH);
   digitalWrite(MOSFET_BW_GATE_2, HIGH);
@@ -145,6 +157,10 @@ void right()
   digitalWrite(drain, HIGH);
   digitalWrite(MOSFET_DRAIN, HIGH);
   analogWrite(MOSFET_GATE, PWM_Speed);
+  analogWrite(MOSFET_BW_GATE_1, PWM_Speed);
+  analogWrite(MOSFET_BW_GATE_2, PWM_Speed);
+  digitalWrite(MOSFET_BW_DRAIN_1, HIGH);
+  digitalWrite(MOSFET_BW_DRAIN_2, HIGH);
   delay(10);
 }
 
